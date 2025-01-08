@@ -1,0 +1,17 @@
+syntax = "proto3";
+package job_post_etl_payload;
+import "google/protobuf/timestamp.proto";
+option go_package = "generated/proto/job_post_etl_payload";
+
+message company{
+  string id = 1;
+  string name = 2;
+}
+
+message job_post{
+  string id = 1;
+  company company = 2;
+  string title = 3;
+  string description = 4;
+  google.protobuf.Timestamp created_at = 5;
+}

@@ -1,0 +1,360 @@
+openapi: 3.0.1
+info:
+  contact: { }
+  title: job portal api
+  version: 1.0.0
+servers:
+  - url: http://localhost:8282
+paths:
+  /api/v1/jobs:
+    post:
+      summary: Create a new job
+      operationId: V1PostJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V1PostJobRequestBody'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V1PostJobResponse201'
+        400:
+          description: BAD_REQUEST
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error400'
+                  - $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '408':
+          $ref: '#/components/responses/TimeoutError'
+    get:
+      summary: get list job
+      operationId: V1GetListJob
+      parameters:
+        - name: search_keyword
+          in: query
+          description: params for search job by title and description
+          required: false
+          schema:
+            type: string
+            example: Backend Engineer
+        - name: company_id
+          in: query
+          required: false
+          description: filter by company
+          schema:
+            type: string
+            example: "c885e44b-dab1-461c-a7c3-94a76e88fae3"
+        - $ref: '#/components/parameters/PaginationPage_QueryParameter'
+        - $ref: '#/components/parameters/PaginationPageSize_QueryParameter'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V1GetListJobResponse200'
+        400:
+          description: BAD_REQUEST
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error400'
+                  - $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '408':
+          $ref: '#/components/responses/TimeoutError'
+  /api/v1/company:
+    get:
+      summary: get list company
+      operationId: V1GetListCompany
+      parameters:
+        - name: search_keyword
+          in: query
+          description: params for search job by name
+          required: false
+          schema:
+            type: string
+            example: REDIKRU
+        - $ref: '#/components/parameters/PaginationPage_QueryParameter'
+        - $ref: '#/components/parameters/PaginationPageSize_QueryParameter'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V1GetListCompanyResponse200'
+        400:
+          description: BAD_REQUEST
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error400'
+                  - $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '408':
+          $ref: '#/components/responses/TimeoutError'
+  /health-check:
+    get:
+      operationId: V1HealthCheck
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V1HealthCheckResponse200'
+
+components:
+  parameters:
+    PaginationPageSize_QueryParameter:
+      name: page_size
+      in: query
+      description: 'param page size, default 20 if set as 0, max size is 50 also'
+      schema:
+        description: Maximum data at pagination
+        type: integer
+        format: int64
+        example: 5
+        default: 10
+        maximum: 50
+        minimum: 0
+      x-oapi-codegen-extra-tags:
+        validate: 'max=50,min=0'
+        form: 'page_size,default=10'
+    PaginationPage_QueryParameter:
+      name: page
+      in: query
+      description: param pointer page
+      schema:
+        description: 'Get page at pagination, if set the minimum value is 1'
+        type: integer
+        format: int64
+        example: 1
+        default: 1
+        minimum: 1
+      x-oapi-codegen-extra-tags:
+        form: 'page,default=1'
+        validate: min=1
+  schemas:
+    V1PostJobRequestBody:
+      type: object
+      properties:
+        company:
+          $ref: '#/components/schemas/V1PostJobRequestBodyCompany'
+        title:
+          type: string
+          description: The title of the job.
+          example: "Software Engineer"
+          x-oapi-codegen-extra-tags:
+            validate: "required,max=255,min=5"
+        description:
+          type: string
+          description: A detailed description of the job.
+          example: "Responsible for developing and maintaining web applications."
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=5"
+      required:
+        - description
+        - title
+        - company
+    V1PostJobRequestBodyCompany:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the company.
+          example: "Tech Corp"
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=5,max=100"
+      required:
+        - name
+    V1PostJobResponse201:
+      type: object
+      properties:
+        company_id:
+          type: string
+          example: "d1c10c57-ac0c-43f0-b26e-d8c210915794"
+        job_id:
+          type: string
+          example: "40555017-190b-43e7-a811-48c1715c5a1a"
+      required:
+        - company_id
+        - job_id
+    V1GetListJobResponse200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/V1GetListJobItemResponse200'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+    V1GetListJobItemResponse200:
+      type: object
+      properties:
+        company:
+          $ref: '#/components/schemas/V1GetListJobItemCompanyResponse200'
+        title:
+          type: string
+          description: The title of the job.
+          example: "Software Engineer"
+        description:
+          type: string
+          description: A detailed description of the job.
+          example: "Responsible for developing and maintaining web applications."
+        id:
+          type: string
+          example: "40555017-190b-43e7-a811-48c1715c5a1a"
+          description: job id
+        timestamp:
+          type: string
+          format: date-time
+          description: created_at job, be send format using RFC3339 and default offset is 0 or UTC
+          example: '2017-07-21T07:50:00Z'
+      required:
+        - company
+        - id
+        - timestamp
+        - title
+        - description
+    V1GetListJobItemCompanyResponse200:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "d1c10c57-ac0c-43f0-b26e-d8c210915794"
+        name:
+          type: string
+          example: "REDIKRU"
+      required:
+        - name
+        - id
+
+    V1GetListCompanyResponse200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/V1GetListCompanyItemResponse200'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+        - data
+        - pagination
+    V1GetListCompanyItemResponse200:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A detailed description of the job.
+          example: "REDIKRU"
+        id:
+          type: string
+          example: "40555017-190b-43e7-a811-48c1715c5a1a"
+          description: job id
+      required:
+        - id
+        - name
+    V1HealthCheckResponse200:
+      type: object
+      properties:
+        database_command:
+          type: string
+        database_query:
+          type: string
+        kafka:
+          type: string
+      required:
+        - database_command
+        - database_query
+        - kafka
+    PaginationResponse:
+      type: object
+      properties:
+        page:
+          description: 'Current page number, default is 1'
+          type: integer
+          format: int64
+          example: 1
+        page_count:
+          description: Total page (total data / page_size)
+          type: integer
+          format: int64
+          example: 5
+        page_size:
+          description: Maximum data at pagination
+          type: integer
+          format: int64
+          example: 20
+        total_data:
+          description: Total all data available
+          type: integer
+          format: int64
+          example: 15
+      required:
+        - page
+        - page_count
+        - page_size
+        - total_data
+    Error400:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+        - errors
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+  responses:
+    TimeoutError:
+      description: Request Timeout
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnAuthorization:
+      description: Un Authorization
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

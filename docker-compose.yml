@@ -1,0 +1,97 @@
+version: '3'
+
+services:
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250"
+
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    environment:
+      - JAVA_OPTS=-Xms1024m -Xmx1024m -XX:+ExitOnOutOfMemoryError
+    ports:
+      - "9411:9411"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    command: [ "--config=/providerconf/otel-config.yaml", "${OTELCOL_ARGS}" ]
+    volumes:
+      - "./config/otel-config:/providerconf"
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55679:55679" # zpages extension
+    environment:
+      - OTEL_EXPORTER_OTLP_CLIENT_KEY=askdhuiqenfnasasdjuefhjaksdan
+      - OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY=anksbfjahdhajsdyefbahjsd
+      - BASIC_AUTH_USERNAME=user
+      - BASIC_AUTH_PASSWORD=pw
+    depends_on:
+      - zipkin-all-in-one
+      - jaeger-all-in-one
+
+  postgres_command:
+    image: postgres:15
+    container_name: postgres_container_command
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: job_portal
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres_data_command:/var/lib/postgresql/data
+
+  postgres_read:
+    image: postgres:15
+    container_name: postgres_container_read
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: job_portal
+    ports:
+      - "5439:5432"
+    volumes:
+      - postgres_data_read:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper_1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka_1
+    depends_on:
+      - zookeeper
+    ports:
+      - 8003:8003
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      ZOOKEEPER_SASL_ENABLED: 'false'
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://localhost:8003
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka-config/kafka_server_jaas.conf"
+    volumes:
+      - ./config/kafka-config:/etc/kafka/kafka-config
+volumes:
+  postgres_data_read:
+  postgres_data_command:
