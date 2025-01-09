@@ -4,6 +4,6 @@ CREATE TABLE jobs
     company_id  VARCHAR(255),
     title       VARCHAR(255) NOT NULL,
     description TEXT         NOT NULL,
-    created_at  TIMESTAMP    NOT NULL,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );

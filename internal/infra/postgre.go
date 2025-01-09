@@ -6,6 +6,7 @@ import (
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/util"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/util/primitive"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"time"
 )

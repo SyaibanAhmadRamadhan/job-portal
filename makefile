@@ -28,7 +28,7 @@ generate: api/api.yml generate_mocks generate_protobuf
 	oapi-codegen --package api -generate types $< > generated/api/api-types.gen.go
 
 force:
-	@$(MIGRATE_CMD) -path migrations -database=$(DB_DSN) force 20241025154823
+	@$(MIGRATE_CMD) -path migrations -database=$(DB_DSN_COMMAND) force 20250108084709
 
 create:
 	@$(MIGRATE_CMD) create -ext sql -dir $(MIGRATE_DIR) $(NAME)
@@ -47,3 +47,34 @@ down:
 	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN_READER) down
 status:
 	@$(MIGRATE_CMD) status -dir $(MIGRATE_DIR)
+
+clean:
+	find . -name "*.mock.gen.go" -type f -delete
+	find . -name "*.out" -type f -delete
+
+CONFIG_FILE=/etc/kafka/kafka-config/config.properties
+BOOTSTRAP_SERVER=localhost:8003
+TOPIC_NAME=jobpostetl
+REPLICATION_FACTOR=1
+PARTITIONS=1
+create-topic:
+	docker exec -it kafka_1 kafka-topics --create \
+		--bootstrap-server $(BOOTSTRAP_SERVER) \
+		--replication-factor $(REPLICATION_FACTOR) \
+		--partitions $(PARTITIONS) \
+		--topic $(TOPIC_NAME) \
+		--command-config $(CONFIG_FILE)
+
+install_dependency:
+	./bin/install_dependency.sh
+
+docker_compose:
+	docker-compose up -d
+
+unit_test:
+	go test --cover ./...
+
+init: install_dependency docker_compose generate up create-topic
+
+preview_open_api:
+	redocly preview-docs api/api.yml

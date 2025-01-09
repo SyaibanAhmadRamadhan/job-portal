@@ -5,6 +5,7 @@ import (
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/datastore/index_jobs"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/datastore/jobs"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/eventbus"
+	wsqlx "github.com/SyaibanAhmadRamadhan/sqlx-wrapper"
 )
 
 type service struct {
@@ -12,6 +13,8 @@ type service struct {
 	jobRepository               jobs.JobRepository
 	companyRepository           companies.CompanyRepository
 	eventBusPublisherRepository eventbus.PublisherRepository
+
+	dbTx wsqlx.Tx
 }
 
 type Options struct {
@@ -19,6 +22,7 @@ type Options struct {
 	JobRepository               jobs.JobRepository
 	CompanyRepository           companies.CompanyRepository
 	EventBusPublisherRepository eventbus.PublisherRepository
+	DBTx                        wsqlx.Tx
 }
 
 func New(o Options) *service {
@@ -27,5 +31,6 @@ func New(o Options) *service {
 		jobRepository:               o.JobRepository,
 		companyRepository:           o.CompanyRepository,
 		eventBusPublisherRepository: o.EventBusPublisherRepository,
+		dbTx:                        o.DBTx,
 	}
 }

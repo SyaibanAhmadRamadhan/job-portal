@@ -34,6 +34,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '408':
           $ref: '#/components/responses/TimeoutError'
+      tags:
+        - job
     get:
       summary: get list job
       operationId: V1GetListJob
@@ -73,6 +75,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '408':
           $ref: '#/components/responses/TimeoutError'
+      tags:
+        - job
   /api/v1/company:
     get:
       summary: get list company
@@ -106,6 +110,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '408':
           $ref: '#/components/responses/TimeoutError'
+      tags:
+        - company
   /health-check:
     get:
       operationId: V1HealthCheck

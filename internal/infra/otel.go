@@ -61,8 +61,8 @@ func startingOtelProvider(ctx context.Context, exp trace.SpanExporter, traceName
 
 	provider := trace.NewTracerProvider(
 		trace.WithSampler(trace.AlwaysSample()),
-		trace.WithSpanProcessor(bsp),
 		trace.WithResource(res),
+		trace.WithSpanProcessor(bsp),
 	)
 	closeFn := func(ctx context.Context) error {
 		log.Info().Msg("starting shutdown export and provider")
