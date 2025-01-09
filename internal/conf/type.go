@@ -30,10 +30,16 @@ type DatabaseConfig struct {
 	} `json:"READER" mapstructure:"READER"`
 }
 
+type RedisConfig struct {
+	Host     string `json:"HOST" mapstructure:"HOST"`
+	Password string `json:"PASSWORD" mapstructure:"PASSWORD"`
+}
+
 type AppConfig struct {
 	AppName  string         `json:"APP_NAME" mapstructure:"APP_NAME"`
 	Port     int            `json:"PORT" mapstructure:"PORT"`
 	Otel     OTELConfig     `json:"OTEL" mapstructure:"OTEL"`
 	Kafka    KafkaConfig    `json:"KAFKA" mapstructure:"KAFKA"`
 	Database DatabaseConfig `json:"DATABASE" mapstructure:"DATABASE"`
+	Redis    RedisConfig    `json:"REDIS" mapstructure:"REDIS"`
 }

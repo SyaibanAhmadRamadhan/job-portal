@@ -254,7 +254,9 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/V1GetListCompanyItemResponse200'
+          type: array
+          items:
+            $ref: '#/components/schemas/V1GetListCompanyItemResponse200'
         pagination:
           $ref: '#/components/schemas/PaginationResponse'
       required:

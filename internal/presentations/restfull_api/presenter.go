@@ -3,6 +3,7 @@ package restfull_api
 import (
 	"github.com/SyaibanAhmadRamadhan/job-portal/generated/api"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/presentations/restfull_api/handler"
+	"github.com/SyaibanAhmadRamadhan/job-portal/internal/services/company"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/services/job"
 	"github.com/gofiber/contrib/otelfiber/v2"
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +22,8 @@ type Presenter struct {
 }
 
 type Dependency struct {
-	JobService job.JobService
+	JobService     job.JobService
+	CompanyService company.CompanyService
 }
 
 func New(presenter Presenter) *fiber.App {
@@ -29,7 +31,8 @@ func New(presenter Presenter) *fiber.App {
 	initMiddleware(app, presenter.AppName, presenter.AppPort)
 
 	handler.New(app, handler.Options{
-		JobService: presenter.Dependency.JobService,
+		JobService:     presenter.Dependency.JobService,
+		CompanyService: presenter.Dependency.CompanyService,
 	})
 	return app
 }

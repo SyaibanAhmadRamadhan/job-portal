@@ -74,6 +74,9 @@ func Test_service_CreateJob(t *testing.T) {
 						Timestamp: expectedTimestamp,
 					}, nil)
 
+				mockCompanyRepository.EXPECT().
+					ClearCache(ctx).Return(nil)
+
 				mockEventBusPublisherRepository.EXPECT().
 					PublishJobPostETL(ctx, eventbus.PublishJobPostETLInput{
 						Payload: &job_post_etl_payload.JobPost{

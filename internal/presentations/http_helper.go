@@ -117,7 +117,7 @@ func handleTraceError(c *fiber.Ctx, errTrace *tracer.ErrTrace) (int, api.Error) 
 	}
 }
 
-func (h *HTTPHelper) BindToPaginationInput(c *fiber.Ctx) (primitive.PaginationInput, error) {
+func (h *HTTPHelper) BindToPaginationInput(c *fiber.Ctx) primitive.PaginationInput {
 	page := c.QueryInt("page")
 	pageSize := c.QueryInt("page_size")
 
@@ -131,11 +131,11 @@ func (h *HTTPHelper) BindToPaginationInput(c *fiber.Ctx) (primitive.PaginationIn
 	return primitive.PaginationInput{
 		Page:     page,
 		PageSize: pageSize,
-	}, nil
+	}
 }
 
-func (h *HTTPHelper) BindToPaginationResponse(input primitive.PaginationOutput) *api.PaginationResponse {
-	return &api.PaginationResponse{
+func (h *HTTPHelper) BindToPaginationResponse(input primitive.PaginationOutput) api.PaginationResponse {
+	return api.PaginationResponse{
 		Page:      input.Page,
 		PageCount: input.PageCount,
 		PageSize:  input.PageSize,

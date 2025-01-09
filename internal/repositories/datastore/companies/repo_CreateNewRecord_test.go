@@ -20,7 +20,7 @@ func Test_repository_CreateNewRecord(t *testing.T) {
 	sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
 	wsqlxDB := wsqlx.NewRdbms(sqlxDB)
 	ctx := context.TODO()
-	repo := companies.New(wsqlxDB, wsqlxDB)
+	repo := companies.New(wsqlxDB, nil)
 
 	t.Run("should be return correct", func(t *testing.T) {
 		uuid.SetRand(rand.New(rand.NewSource(1)))
@@ -43,5 +43,18 @@ func Test_repository_CreateNewRecord(t *testing.T) {
 		output, err := repo.CreateNewRecord(ctx, expectedInput)
 		require.NoError(t, err)
 		require.Equal(t, expectedOutput, output)
+	})
+
+	t.Run("should be return error tx is nil", func(t *testing.T) {
+
+		expectedInput := companies.CreateNewRecordInput{
+			Tx:   nil,
+			Name: "REDIKRU",
+		}
+
+		output, err := repo.CreateNewRecord(ctx, expectedInput)
+		require.Error(t, err)
+		require.Empty(t, output)
+		require.Contains(t, err.Error(), "database transaction is not open")
 	})
 }

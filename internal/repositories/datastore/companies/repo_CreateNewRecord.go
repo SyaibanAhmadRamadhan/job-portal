@@ -28,6 +28,7 @@ func (r *repository) CreateNewRecord(ctx context.Context, input CreateNewRecordI
 	if err != nil {
 		return output, tracer.ErrInternalServer(err)
 	}
+
 	return
 }
 

@@ -2,6 +2,8 @@
 .vscode
 .DS_Store
 
+redis-data
+
 vendor/
 
 # Test binary, built with `go test -c`

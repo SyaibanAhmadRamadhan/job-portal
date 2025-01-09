@@ -30,8 +30,12 @@ func (s *service) CreateJob(ctx context.Context, input CreateJobInput) (output C
 				Description: input.Description,
 			})
 			if err != nil {
-
 				return tracer.StackTrace(err)
+			}
+
+			err = s.companyRepository.ClearCache(ctx)
+			if err != nil {
+				return tracer.ErrInternalServer(err)
 			}
 
 			err = s.eventBusPublisherRepository.PublishJobPostETL(ctx, eventbus.PublishJobPostETLInput{
