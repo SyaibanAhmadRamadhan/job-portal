@@ -1,19 +1,19 @@
 package primitive
 
 type PaginationInput struct {
-	Page     int64
-	PageSize int64
+	Page     int
+	PageSize int
 }
 
 type PaginationOutput struct {
-	Page      int64
-	PageSize  int64
-	PageCount int64
-	TotalData int64
+	Page      int
+	PageSize  int
+	PageCount int
+	TotalData int
 }
 
-func (p PaginationInput) Offset() int64 {
-	offset := int64(0)
+func (p PaginationInput) Offset() int {
+	offset := int(0)
 	if p.Page > 0 {
 		offset = (p.Page - 1) * p.PageSize
 	}
@@ -21,8 +21,8 @@ func (p PaginationInput) Offset() int64 {
 	return offset
 }
 
-func getPageCount(pageSize, totalData int64) int64 {
-	pageCount := int64(1)
+func getPageCount(pageSize, totalData int) int {
+	pageCount := int(1)
 	if pageSize > 0 {
 		if pageSize >= totalData {
 			return pageCount
@@ -38,7 +38,7 @@ func getPageCount(pageSize, totalData int64) int64 {
 	return pageCount
 }
 
-func CreatePaginationOutput(input PaginationInput, totalData int64) PaginationOutput {
+func CreatePaginationOutput(input PaginationInput, totalData int) PaginationOutput {
 	pageCount := getPageCount(input.PageSize, totalData)
 	return PaginationOutput{
 		Page:      input.Page,

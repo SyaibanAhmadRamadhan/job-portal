@@ -287,22 +287,18 @@ components:
         page:
           description: 'Current page number, default is 1'
           type: integer
-          format: int64
           example: 1
         page_count:
           description: Total page (total data / page_size)
           type: integer
-          format: int64
           example: 5
         page_size:
           description: Maximum data at pagination
           type: integer
-          format: int64
           example: 20
         total_data:
           description: Total all data available
           type: integer
-          format: int64
           example: 15
       required:
         - page
@@ -312,6 +308,8 @@ components:
     Error400:
       type: object
       properties:
+        message:
+          type: string
         errors:
           type: object
           additionalProperties:
@@ -320,6 +318,7 @@ components:
               type: string
       required:
         - errors
+        - message
     Error:
       type: object
       properties:
