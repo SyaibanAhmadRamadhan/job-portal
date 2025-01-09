@@ -37,6 +37,7 @@ func New(app *fiber.App, opts Options) {
 
 func (h *handler) initHandler() {
 	h.app.Post("/api/v1/job", h.V1PostJob)
+	h.app.Get("/api/v1/job", h.V1GetListJob)
 
 	h.app.Get("/api/v1/company", h.V1GetListCompany)
 }

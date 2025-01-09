@@ -64,7 +64,21 @@ func (h *HTTPHelper) ErrResp(c *fiber.Ctx, err error) error {
 }
 
 func (h *HTTPHelper) Bind(c *fiber.Ctx, v interface{}) error {
-	err := c.BodyParser(&v)
+	err := c.BodyParser(v)
+	if err != nil {
+		return err
+	}
+
+	err = h.validator.Struct(v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *HTTPHelper) BindQuery(c *fiber.Ctx, v interface{}) error {
+	err := c.QueryParser(v)
 	if err != nil {
 		return err
 	}

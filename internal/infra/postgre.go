@@ -11,16 +11,16 @@ import (
 	"time"
 )
 
-func NewPostgreCommand(config *conf.DatabaseConfig) (*sqlx.DB, primitive.CloseFunc) {
-	db, err := sqlx.Connect("postgres", config.COMMAND.DSN)
+func NewPostgreCommand(config *conf.PostgreConfig) (*sqlx.DB, primitive.CloseFunc) {
+	db, err := sqlx.Connect("postgres", config.DSN)
 	if err != nil {
 		panic(err)
 	}
 
-	db.SetMaxOpenConns(config.COMMAND.DBMaxOpenConnection)
-	db.SetMaxIdleConns(config.COMMAND.DBMaxIdleConnection)
-	db.SetConnMaxLifetime(time.Second * time.Duration(config.COMMAND.ConnMaxLifetimeSecond))
-	db.SetConnMaxIdleTime(time.Second * time.Duration(config.COMMAND.ConnIdleMaxLifetimeSecond))
+	db.SetMaxOpenConns(config.DBMaxOpenConnection)
+	db.SetMaxIdleConns(config.DBMaxIdleConnection)
+	db.SetConnMaxLifetime(time.Second * time.Duration(config.ConnMaxLifetimeSecond))
+	db.SetConnMaxIdleTime(time.Second * time.Duration(config.ConnIdleMaxLifetimeSecond))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -37,36 +37,6 @@ func NewPostgreCommand(config *conf.DatabaseConfig) (*sqlx.DB, primitive.CloseFu
 		}
 
 		log.Info().Msg("close postgresql db command successfully")
-		return
-	}
-}
-
-func NewPostgreQuery(config *conf.DatabaseConfig) (*sqlx.DB, primitive.CloseFunc) {
-	db, err := sqlx.Connect("postgres", config.READER.DSN)
-	if err != nil {
-		panic(err)
-	}
-
-	db.SetMaxOpenConns(config.READER.DBMaxOpenConnection)
-	db.SetMaxIdleConns(config.READER.DBMaxIdleConnection)
-	db.SetConnMaxLifetime(time.Second * time.Duration(config.READER.ConnMaxLifetimeSecond))
-	db.SetConnMaxIdleTime(time.Second * time.Duration(config.READER.ConnIdleMaxLifetimeSecond))
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err = db.PingContext(ctx)
-	util.Panic(err)
-
-	log.Info().Msg("initialization postgresql db reader successfully")
-	return db, func(ctx context.Context) (err error) {
-		log.Info().Msg("starting close postgresql db reader")
-
-		err = db.Close()
-		if err != nil {
-			return err
-		}
-
-		log.Info().Msg("close postgresql db reader successfully")
 		return
 	}
 }

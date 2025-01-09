@@ -47,6 +47,8 @@ paths:
           schema:
             type: string
             example: Backend Engineer
+          x-oapi-codegen-extra-tags:
+            query: 'search_keyword'
         - name: company_id
           in: query
           required: false
@@ -54,6 +56,8 @@ paths:
           schema:
             type: string
             example: "c885e44b-dab1-461c-a7c3-94a76e88fae3"
+          x-oapi-codegen-extra-tags:
+            query: 'company_id'
         - $ref: '#/components/parameters/PaginationPage_QueryParameter'
         - $ref: '#/components/parameters/PaginationPageSize_QueryParameter'
       responses:
@@ -128,6 +132,7 @@ components:
     PaginationPageSize_QueryParameter:
       name: page_size
       in: query
+      required: true
       description: 'param page size, default 20 if set as 0, max size is 50 also'
       schema:
         description: Maximum data at pagination
@@ -139,9 +144,10 @@ components:
         minimum: 0
       x-oapi-codegen-extra-tags:
         validate: 'max=50,min=0'
-        form: 'page_size,default=10'
+        query: 'page_size,default=10'
     PaginationPage_QueryParameter:
       name: page
+      required: true
       in: query
       description: param pointer page
       schema:
@@ -152,7 +158,7 @@ components:
         default: 1
         minimum: 1
       x-oapi-codegen-extra-tags:
-        form: 'page,default=1'
+        query: 'page,default=1'
         validate: min=1
   schemas:
     V1PostJobRequestBody:
@@ -203,7 +209,9 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/V1GetListJobItemResponse200'
+          type: array
+          items:
+            $ref: '#/components/schemas/V1GetListJobItemResponse200'
         pagination:
           $ref: '#/components/schemas/PaginationResponse'
       required:

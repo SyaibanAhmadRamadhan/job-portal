@@ -13,21 +13,20 @@ type KafkaConfig struct {
 }
 
 type DatabaseConfig struct {
-	COMMAND struct {
-		DSN                       string `json:"DSN" mapstructure:"DSN"`
-		DBMaxIdleConnection       int    `json:"DB_MAX_IDLE_CONNECTION" mapstructure:"DB_MAX_IDLE_CONNECTION"`
-		DBMaxOpenConnection       int    `json:"DB_MAX_OPEN_CONNECTION" mapstructure:"DB_MAX_OPEN_CONNECTION"`
-		ConnMaxLifetimeSecond     int    `json:"CONN_MAX_LIFETIME_SECOND" mapstructure:"CONN_MAX_LIFETIME_SECOND"`
-		ConnIdleMaxLifetimeSecond int    `json:"CONN_IDLE_MAX_LIFETIME_SECOND" mapstructure:"CONN_IDLE_MAX_LIFETIME_SECOND"`
-	} `json:"COMMAND" mapstructure:"COMMAND"`
+	PostgreConfig       PostgreConfig       `json:"POSTGRE_CONFIG" mapstructure:"POSTGRE_CONFIG"`
+	ElasticsearchConfig ElasticsearchConfig `json:"ES" mapstructure:"ES"`
+}
 
-	READER struct {
-		DSN                       string `json:"DSN" mapstructure:"DSN"`
-		DBMaxIdleConnection       int    `json:"DB_MAX_IDLE_CONNECTION" mapstructure:"DB_MAX_IDLE_CONNECTION"`
-		DBMaxOpenConnection       int    `json:"DB_MAX_OPEN_CONNECTION" mapstructure:"DB_MAX_OPEN_CONNECTION"`
-		ConnMaxLifetimeSecond     int    `json:"CONN_MAX_LIFETIME_SECOND" mapstructure:"CONN_MAX_LIFETIME_SECOND"`
-		ConnIdleMaxLifetimeSecond int    `json:"CONN_IDLE_MAX_LIFETIME_SECOND" mapstructure:"CONN_IDLE_MAX_LIFETIME_SECOND"`
-	} `json:"READER" mapstructure:"READER"`
+type ElasticsearchConfig struct {
+	Host string `json:"HOST" mapstructure:"HOST"`
+}
+
+type PostgreConfig struct {
+	DSN                       string `json:"DSN" mapstructure:"DSN"`
+	DBMaxIdleConnection       int    `json:"DB_MAX_IDLE_CONNECTION" mapstructure:"DB_MAX_IDLE_CONNECTION"`
+	DBMaxOpenConnection       int    `json:"DB_MAX_OPEN_CONNECTION" mapstructure:"DB_MAX_OPEN_CONNECTION"`
+	ConnMaxLifetimeSecond     int    `json:"CONN_MAX_LIFETIME_SECOND" mapstructure:"CONN_MAX_LIFETIME_SECOND"`
+	ConnIdleMaxLifetimeSecond int    `json:"CONN_IDLE_MAX_LIFETIME_SECOND" mapstructure:"CONN_IDLE_MAX_LIFETIME_SECOND"`
 }
 
 type RedisConfig struct {

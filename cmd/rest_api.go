@@ -24,10 +24,8 @@ var restApiCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		c := conf.LoadConfig()
 		closeFnOtel := infra.NewOtel(&c.Otel, c.AppName)
-		db, closeFnDB := infra.NewPostgreCommand(&c.Database)
-		//dbQuery, closeFnDBQuery := infra.NewPostgreQuery(&c.Database)
+		db, closeFnDB := infra.NewPostgreCommand(&c.Database.PostgreConfig)
 		wsqlxDb := wsqlx.NewRdbms(db)
-		//wsqlxQuery := wsqlx.NewRdbms(dbQuery)
 		kafkaBroker, closeFnKafkaBroker := infra.NewKafkaWriter(c.Kafka)
 		redisClient, closeFnRedis := infra.NewRedisWithOtel(&c.Redis, c.AppName)
 
