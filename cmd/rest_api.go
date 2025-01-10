@@ -7,6 +7,7 @@ import (
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/infra"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/presentations/restfull_api"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/datastore/companies"
+	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/datastore/index_jobs"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/datastore/jobs"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/repositories/eventbus"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/services/company"
@@ -28,16 +29,17 @@ var restApiCmd = &cobra.Command{
 		wsqlxDb := wsqlx.NewRdbms(db)
 		kafkaBroker, closeFnKafkaBroker := infra.NewKafkaWriter(c.Kafka)
 		redisClient, closeFnRedis := infra.NewRedisWithOtel(&c.Redis, c.AppName)
+		esClient, closeFnEs := infra.NewES(&c.Database.ElasticsearchConfig)
 
 		// REPO LAYER
 		jobsRepository := jobs.New(wsqlxDb)
-		//indexJobsRepository := index_jobs.New(wsqlxQuery)
+		indexJobsRepository := index_jobs.New(esClient)
 		companiesRepository := companies.New(wsqlxDb, redisClient)
-		eventbusRepository := eventbus.New(kafkaBroker)
+		eventbusRepository := eventbus.New(kafkaBroker, &c.Kafka)
 
 		// SERVICE LAYER
 		jobService := job.New(job.Options{
-			IndexJobRepository:          nil,
+			IndexJobRepository:          indexJobsRepository,
 			JobRepository:               jobsRepository,
 			CompanyRepository:           companiesRepository,
 			EventBusPublisherRepository: eventbusRepository,
@@ -69,16 +71,12 @@ var restApiCmd = &cobra.Command{
 		<-ctx.Done()
 		log.Info().Msg("Received shutdown signal, shutting down server gracefully...")
 
-		if err := closeFnDB(context.TODO()); err != nil {
-			log.Error().Err(err).Msgf("failed closed db command: %v", err)
+		if err := server.Shutdown(); err != nil {
+			log.Error().Err(err).Msgf("failed to shutdown server gracefully: %v", err)
 		}
 
-		//if err := closeFnDBQuery(context.TODO()); err != nil {
-		//	log.Error().Err(err).Msgf("failed closed db query: %v", err)
-		//}
-
-		if err := closeFnOtel(context.TODO()); err != nil {
-			log.Error().Err(err).Msgf("failed closed otel: %v", err)
+		if err := closeFnDB(context.TODO()); err != nil {
+			log.Error().Err(err).Msgf("failed closed db command: %v", err)
 		}
 
 		if err := closeFnKafkaBroker(context.TODO()); err != nil {
@@ -87,6 +85,14 @@ var restApiCmd = &cobra.Command{
 
 		if err := closeFnRedis(context.TODO()); err != nil {
 			log.Error().Err(err).Msgf("failed closed redis client: %v", err)
+		}
+
+		if err := closeFnEs(context.TODO()); err != nil {
+			log.Error().Err(err).Msgf("failed closed redis client: %v", err)
+		}
+
+		if err := closeFnOtel(context.TODO()); err != nil {
+			log.Error().Err(err).Msgf("failed closed otel: %v", err)
 		}
 
 		log.Info().Msg("Shutdown complete. Exiting.")

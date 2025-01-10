@@ -2,14 +2,17 @@ package eventbus
 
 import (
 	ekafka "github.com/SyaibanAhmadRamadhan/event-bus/kafka"
+	"github.com/SyaibanAhmadRamadhan/job-portal/internal/conf"
 )
 
 type repository struct {
-	kafkaWriter ekafka.KafkaPubSub
+	client ekafka.KafkaPubSub
+	conf   *conf.KafkaConfig
 }
 
-func New(kafkaWriter ekafka.KafkaPubSub) *repository {
+func New(client ekafka.KafkaPubSub, conf *conf.KafkaConfig) *repository {
 	return &repository{
-		kafkaWriter: kafkaWriter,
+		client: client,
+		conf:   conf,
 	}
 }

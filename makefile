@@ -1,7 +1,6 @@
 MIGRATE_CMD=migrate
 MIGRATE_DIR=./migrations
-DB_DSN_COMMAND=postgres://root:root@127.0.0.1:5438/job_portal?sslmode=disable
-DB_DSN_READER=postgres://root:root@127.0.0.1:5439/job_portal?sslmode=disable
+DB_DSN=postgres://root:root@127.0.0.1:5438/job_portal?sslmode=disable
 DATE=$(shell date +%Y%m%d_%H%M%S)
 
 # Generates mocks for interfaces
@@ -28,14 +27,13 @@ generate: api/api.yml generate_mocks generate_protobuf
 	oapi-codegen --package api -generate types $< > generated/api/api-types.gen.go
 
 force:
-	@$(MIGRATE_CMD) -path migrations -database=$(DB_DSN_COMMAND) force 20250108084709
+	@$(MIGRATE_CMD) -path migrations -database=$(DB_DSN) force 20250108084709
 
 create:
 	@$(MIGRATE_CMD) create -ext sql -dir $(MIGRATE_DIR) $(NAME)
 
 up:
-	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN_COMMAND) up
-	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN_READER) up
+	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN) up
 
 reset:
 	@$(MIGRATE_CMD) reset -dir $(MIGRATE_DIR)
@@ -43,8 +41,7 @@ reset:
 refresh: reset up
 
 down:
-	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN_COMMAND) down
-	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN_READER) down
+	@$(MIGRATE_CMD) -source file://$(MIGRATE_DIR) -database=$(DB_DSN) down
 status:
 	@$(MIGRATE_CMD) status -dir $(MIGRATE_DIR)
 
@@ -72,9 +69,16 @@ docker_compose:
 	docker-compose up -d
 
 unit_test:
-	go test --cover ./...
+	go test -coverprofile=coverage.out ./...
+
 
 init: install_dependency docker_compose generate up create-topic
 
 preview_open_api:
 	redocly preview-docs api/api.yml
+
+run_rest_api:
+	go run ./cmd rest-api
+
+run_consumer:
+	go run ./cmd consumer-etl-job-post

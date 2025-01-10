@@ -1,18 +1,17 @@
 package index_jobs
 
 import (
-	"github.com/Masterminds/squirrel"
-	wsqlx "github.com/SyaibanAhmadRamadhan/sqlx-wrapper"
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 type repository struct {
-	rdbms wsqlx.Rdbms
-	sq    squirrel.StatementBuilderType
+	client    *elasticsearch.TypedClient
+	indexName string
 }
 
-func New(rdbms wsqlx.Rdbms) *repository {
+func New(client *elasticsearch.TypedClient) *repository {
 	return &repository{
-		rdbms: rdbms,
-		sq:    squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
+		client:    client,
+		indexName: "index_job",
 	}
 }

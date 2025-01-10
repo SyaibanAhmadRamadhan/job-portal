@@ -116,17 +116,6 @@ paths:
           $ref: '#/components/responses/TimeoutError'
       tags:
         - company
-  /health-check:
-    get:
-      operationId: V1HealthCheck
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/V1HealthCheckResponse200'
-
 components:
   parameters:
     PaginationPageSize_QueryParameter:
@@ -284,19 +273,6 @@ components:
       required:
         - id
         - name
-    V1HealthCheckResponse200:
-      type: object
-      properties:
-        database_command:
-          type: string
-        database_query:
-          type: string
-        kafka:
-          type: string
-      required:
-        - database_command
-        - database_query
-        - kafka
     PaginationResponse:
       type: object
       properties:

@@ -13,6 +13,7 @@ type service struct {
 	jobRepository               jobs.JobRepository
 	companyRepository           companies.CompanyRepository
 	eventBusPublisherRepository eventbus.PublisherRepository
+	eventBusConsumerRepository  eventbus.ConsumerRepository
 
 	dbTx wsqlx.Tx
 }
@@ -22,6 +23,7 @@ type Options struct {
 	JobRepository               jobs.JobRepository
 	CompanyRepository           companies.CompanyRepository
 	EventBusPublisherRepository eventbus.PublisherRepository
+	EventBusConsumerRepository  eventbus.ConsumerRepository
 	DBTx                        wsqlx.Tx
 }
 
@@ -31,6 +33,7 @@ func New(o Options) *service {
 		jobRepository:               o.JobRepository,
 		companyRepository:           o.CompanyRepository,
 		eventBusPublisherRepository: o.EventBusPublisherRepository,
+		eventBusConsumerRepository:  o.EventBusConsumerRepository,
 		dbTx:                        o.DBTx,
 	}
 }

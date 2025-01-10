@@ -36,9 +36,9 @@ services:
       - zipkin-all-in-one
       - jaeger-all-in-one
 
-  postgres_command:
+  postgres:
     image: postgres:15
-    container_name: postgres_container_command
+    container_name: postgres_container
     restart: always
     environment:
       POSTGRES_USER: root
@@ -47,20 +47,7 @@ services:
     ports:
       - "5438:5432"
     volumes:
-      - postgres_data_command:/var/lib/postgresql/data
-
-  postgres_read:
-    image: postgres:15
-    container_name: postgres_container_read
-    restart: always
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: job_portal
-    ports:
-      - "5439:5432"
-    volumes:
-      - postgres_data_read:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0
@@ -68,6 +55,7 @@ services:
     environment:
       - discovery.type=single-node
       - ELASTIC_PASSWORD=changeme
+      - LICENSE=basic
     ports:
       - 9200:9200
       - 9300:9300
@@ -114,6 +102,5 @@ services:
       - ./redis-data:/data
 
 volumes:
-  postgres_data_read:
-  postgres_data_command:
+  postgres_data:
   es_data:

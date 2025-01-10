@@ -30,7 +30,7 @@ func (r *repository) PublishJobPostETL(ctx context.Context, input PublishJobPost
 	propagator := otel.GetTextMapPropagator()
 	propagator.Inject(ctx, ekafka.NewMsgCarrier(&msg))
 
-	_, err = r.kafkaWriter.Publish(ctx, ekafka.PubInput{
+	_, err = r.client.Publish(ctx, ekafka.PubInput{
 		Messages: []kafka.Message{msg},
 	})
 	if err != nil {

@@ -13,7 +13,7 @@ type KafkaConfig struct {
 }
 
 type DatabaseConfig struct {
-	PostgreConfig       PostgreConfig       `json:"POSTGRE_CONFIG" mapstructure:"POSTGRE_CONFIG"`
+	PostgreConfig       PostgreConfig       `json:"POSTGRE" mapstructure:"POSTGRE"`
 	ElasticsearchConfig ElasticsearchConfig `json:"ES" mapstructure:"ES"`
 }
 
