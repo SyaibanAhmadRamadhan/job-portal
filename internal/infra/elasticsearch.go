@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/conf"
 	"github.com/SyaibanAhmadRamadhan/job-portal/internal/util"
@@ -17,11 +18,18 @@ import (
 )
 
 func NewES(config *conf.ElasticsearchConfig) (*elasticsearch.TypedClient, primitive.CloseFunc) {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+
 	typedClient, err := elasticsearch.NewTypedClient(elasticsearch.Config{
 		Addresses:       []string{config.Host},
 		Instrumentation: elastictransport.NewOtelInstrumentation(otel.GetTracerProvider(), true, "8.10"),
 		Password:        "changeme",
 		Username:        "elastic",
+		Transport:       transport,
 	})
 	util.Panic(err)
 
@@ -66,7 +74,6 @@ func NewES(config *conf.ElasticsearchConfig) (*elasticsearch.TypedClient, primit
 		}).
 		Do(nil)
 
-	//util.Panic(err)
 	if err != nil {
 		var esError *types.ElasticsearchError
 		if errors.As(err, &esError) {
